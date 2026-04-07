@@ -22,23 +22,53 @@ function exportSTL(geometry: THREE.BufferGeometry, text: string) {
   download(new Blob([result], { type: 'application/octet-stream' }), text, 'stl');
 }
 
-async function export3MF(geometry: THREE.BufferGeometry, text: string) {
-  // 3MF is a ZIP containing XML files describing the mesh
+function export3MF(geometry: THREE.BufferGeometry, text: string) {
+  // Expand to non-indexed so we have raw triangles
   const nonIndexed = geometry.index ? geometry.toNonIndexed() : geometry;
   const positions = nonIndexed.getAttribute('position');
+  const triCount = Math.floor(positions.count / 3);
 
-  // Build vertex list and triangle list
-  let verticesXml = '';
-  for (let i = 0; i < positions.count; i++) {
-    const x = positions.getX(i).toFixed(6);
-    const y = positions.getY(i).toFixed(6);
-    const z = positions.getZ(i).toFixed(6);
-    verticesXml += `          <vertex x="${x}" y="${y}" z="${z}" />\n`;
+  // Deduplicate vertices using a spatial hash map
+  // Round to 4 decimal places (~0.1 micron precision) for dedup
+  const precision = 10000;
+  const vertexMap = new Map<string, number>();
+  const uniqueVerts: number[] = []; // flat [x,y,z, x,y,z, ...]
+  const triangles: number[] = [];   // flat [v1,v2,v3, v1,v2,v3, ...]
+
+  function getVertexIndex(x: number, y: number, z: number): number {
+    const rx = Math.round(x * precision) / precision;
+    const ry = Math.round(y * precision) / precision;
+    const rz = Math.round(z * precision) / precision;
+    const key = `${rx},${ry},${rz}`;
+    const existing = vertexMap.get(key);
+    if (existing !== undefined) return existing;
+    const idx = uniqueVerts.length / 3;
+    vertexMap.set(key, idx);
+    uniqueVerts.push(rx, ry, rz);
+    return idx;
   }
 
-  let trianglesXml = '';
-  for (let i = 0; i < positions.count; i += 3) {
-    trianglesXml += `          <triangle v1="${i}" v2="${i + 1}" v3="${i + 2}" />\n`;
+  for (let t = 0; t < triCount; t++) {
+    const i = t * 3;
+    const v1 = getVertexIndex(positions.getX(i), positions.getY(i), positions.getZ(i));
+    const v2 = getVertexIndex(positions.getX(i + 1), positions.getY(i + 1), positions.getZ(i + 1));
+    const v3 = getVertexIndex(positions.getX(i + 2), positions.getY(i + 2), positions.getZ(i + 2));
+
+    // Skip degenerate triangles
+    if (v1 === v2 || v2 === v3 || v1 === v3) continue;
+
+    triangles.push(v1, v2, v3);
+  }
+
+  // Build XML
+  const vertLines: string[] = [];
+  for (let i = 0; i < uniqueVerts.length; i += 3) {
+    vertLines.push(`          <vertex x="${uniqueVerts[i]}" y="${uniqueVerts[i + 1]}" z="${uniqueVerts[i + 2]}" />`);
+  }
+
+  const triLines: string[] = [];
+  for (let i = 0; i < triangles.length; i += 3) {
+    triLines.push(`          <triangle v1="${triangles[i]}" v2="${triangles[i + 1]}" v3="${triangles[i + 2]}" />`);
   }
 
   const modelXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -47,9 +77,11 @@ async function export3MF(geometry: THREE.BufferGeometry, text: string) {
     <object id="1" type="model">
       <mesh>
         <vertices>
-${verticesXml}        </vertices>
+${vertLines.join('\n')}
+        </vertices>
         <triangles>
-${trianglesXml}        </triangles>
+${triLines.join('\n')}
+        </triangles>
       </mesh>
     </object>
   </resources>
@@ -69,8 +101,6 @@ ${trianglesXml}        </triangles>
   <Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel" />
 </Relationships>`;
 
-  // Build ZIP using the compression streams API isn't available everywhere,
-  // so we build an uncompressed ZIP manually (3MF spec allows stored entries)
   const zip = buildZip([
     { name: '[Content_Types].xml', data: new TextEncoder().encode(contentTypesXml) },
     { name: '_rels/.rels', data: new TextEncoder().encode(relsXml) },
@@ -103,45 +133,43 @@ function buildZip(entries: ZipEntry[]): Uint8Array {
     const nameBytes = new TextEncoder().encode(entry.name);
     const crc = crc32(entry.data);
 
-    // Local file header (30 + name + data)
     const local = new ArrayBuffer(30 + nameBytes.length);
     const lv = new DataView(local);
-    lv.setUint32(0, 0x04034b50, true);  // signature
-    lv.setUint16(4, 20, true);           // version needed
-    lv.setUint16(6, 0, true);            // flags
-    lv.setUint16(8, 0, true);            // compression: store
-    lv.setUint16(10, 0, true);           // mod time
-    lv.setUint16(12, 0, true);           // mod date
-    lv.setUint32(14, crc, true);         // crc32
-    lv.setUint32(18, entry.data.length, true); // compressed size
-    lv.setUint32(22, entry.data.length, true); // uncompressed size
-    lv.setUint16(26, nameBytes.length, true);  // name length
-    lv.setUint16(28, 0, true);           // extra length
+    lv.setUint32(0, 0x04034b50, true);
+    lv.setUint16(4, 20, true);
+    lv.setUint16(6, 0, true);
+    lv.setUint16(8, 0, true);
+    lv.setUint16(10, 0, true);
+    lv.setUint16(12, 0, true);
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, entry.data.length, true);
+    lv.setUint32(22, entry.data.length, true);
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);
     new Uint8Array(local).set(nameBytes, 30);
 
     localHeaders.push(new Uint8Array(local));
     localHeaders.push(entry.data);
 
-    // Central directory header (46 + name)
     const central = new ArrayBuffer(46 + nameBytes.length);
     const cv = new DataView(central);
-    cv.setUint32(0, 0x02014b50, true);  // signature
-    cv.setUint16(4, 20, true);           // version made by
-    cv.setUint16(6, 20, true);           // version needed
-    cv.setUint16(8, 0, true);            // flags
-    cv.setUint16(10, 0, true);           // compression
-    cv.setUint16(12, 0, true);           // mod time
-    cv.setUint16(14, 0, true);           // mod date
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0, true);
     cv.setUint32(16, crc, true);
     cv.setUint32(20, entry.data.length, true);
     cv.setUint32(24, entry.data.length, true);
     cv.setUint16(28, nameBytes.length, true);
-    cv.setUint16(30, 0, true);           // extra length
-    cv.setUint16(32, 0, true);           // comment length
-    cv.setUint16(34, 0, true);           // disk number
-    cv.setUint16(36, 0, true);           // internal attrs
-    cv.setUint32(38, 0, true);           // external attrs
-    cv.setUint32(42, offset, true);      // local header offset
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
     new Uint8Array(central).set(nameBytes, 46);
 
     centralHeaders.push(new Uint8Array(central));
@@ -152,7 +180,6 @@ function buildZip(entries: ZipEntry[]): Uint8Array {
   let centralDirSize = 0;
   for (const ch of centralHeaders) centralDirSize += ch.length;
 
-  // End of central directory (22 bytes)
   const eocd = new ArrayBuffer(22);
   const ev = new DataView(eocd);
   ev.setUint32(0, 0x06054b50, true);
