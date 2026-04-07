@@ -1,6 +1,6 @@
 # Plaque Maker
 
-**Live site: [https://rizato.github.io/logo-maker/](https://rizato.github.io/logo-maker/)**
+**Live site: [https://rizato.github.io/logo-maker/](https://rizato.github.io/Blasting-Machine-Plaque-Maker)**
 
 A browser-based tool for generating 3D plaques with oval-warped raised text, ready for 3D printing. No backend required — everything runs client-side.
 
