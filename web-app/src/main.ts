@@ -2,7 +2,8 @@ import './style.css';
 import { loadPlaque } from './plaque-loader.ts';
 import { loadFont, generateTextGeometry, generateOvalRing } from './text-generator.ts';
 import { PlaqueViewer } from './viewer.ts';
-import { exportSTL } from './exporter.ts';
+import { exportModel } from './exporter.ts';
+import type { ExportFormat } from './exporter.ts';
 import { computeDimensionsFromGeometry } from './plaque-config.ts';
 
 const app = document.getElementById('app')!;
@@ -12,10 +13,13 @@ const submitBtn = document.getElementById('submit-btn')!;
 const textInputEditor = document.getElementById('text-input-editor') as HTMLInputElement;
 const submitBtnEditor = document.getElementById('submit-btn-editor')!;
 const exportBtn = document.getElementById('export-btn') as HTMLButtonElement;
+const exportCaretBtn = document.getElementById('export-dropdown-btn') as HTMLButtonElement;
+const exportMenu = document.getElementById('export-menu')!;
 const errorEl = document.getElementById('error-msg')!;
 
 let viewer: PlaqueViewer | null = null;
 let currentText = '';
+let exportFormat: ExportFormat = 'stl';
 
 async function init() {
   try {
@@ -49,7 +53,9 @@ async function init() {
 
       const textGeo = generateTextGeometry(text, font);
       viewer!.setTextGeometry(textGeo);
-      exportBtn.disabled = !viewer!.hasText();
+      const hasText = viewer!.hasText();
+      exportBtn.disabled = !hasText;
+      exportCaretBtn.disabled = !hasText;
     };
 
     textInput.addEventListener('keydown', (e) => {
@@ -62,12 +68,36 @@ async function init() {
     });
     submitBtnEditor.addEventListener('click', () => generatePlaque(textInputEditor.value.trim()));
 
+    // Export button — downloads in current format
     exportBtn.addEventListener('click', () => {
       if (!viewer) return;
       const combined = viewer.getCombinedGeometry();
       if (combined) {
-        exportSTL(combined, currentText);
+        exportModel(combined, currentText, exportFormat);
       }
+    });
+
+    // Dropdown caret — toggles format menu
+    exportCaretBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportMenu.classList.toggle('open');
+    });
+
+    // Format selection from dropdown
+    exportMenu.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const format = target.dataset.format as ExportFormat | undefined;
+      if (!format) return;
+      exportFormat = format;
+      exportBtn.textContent = `Download ${format.toUpperCase()}`;
+      exportMenu.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      target.classList.add('active');
+      exportMenu.classList.remove('open');
+    });
+
+    // Close dropdown when clicking elsewhere
+    document.addEventListener('click', () => {
+      exportMenu.classList.remove('open');
     });
   } catch (err) {
     errorEl.textContent = `Failed to initialize: ${err}`;

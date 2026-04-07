@@ -123,17 +123,25 @@ html, body {
   max-width: 400px;
 }
 
+/* ── Split export button ───────────────────────────────────── */
+
+.export-split-btn {
+  position: relative;
+  display: flex;
+  white-space: nowrap;
+}
+
 #export-btn {
   padding: 10px 20px;
   font-size: 0.95rem;
   font-weight: 600;
   border: 2px solid #4caf50;
-  border-radius: 8px;
+  border-right: 1px solid #4caf50;
+  border-radius: 8px 0 0 8px;
   background: transparent;
   color: #4caf50;
   cursor: pointer;
   transition: all 0.2s;
-  white-space: nowrap;
 }
 
 #export-btn:hover:not(:disabled) {
@@ -145,6 +153,67 @@ html, body {
   border-color: #555;
   color: #555;
   cursor: not-allowed;
+}
+
+.export-caret {
+  padding: 10px 10px;
+  font-size: 0.85rem;
+  border: 2px solid #4caf50;
+  border-left: 1px solid #4caf50;
+  border-radius: 0 8px 8px 0;
+  background: transparent;
+  color: #4caf50;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.export-caret:hover:not(:disabled) {
+  background: #4caf50;
+  color: #fff;
+}
+
+.export-caret:disabled {
+  border-color: #555;
+  color: #555;
+  cursor: not-allowed;
+}
+
+.export-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: #1e1e36;
+  border: 1px solid #444;
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.export-menu.open {
+  display: flex;
+  flex-direction: column;
+}
+
+.export-menu button {
+  padding: 8px 24px;
+  font-size: 0.9rem;
+  border: none;
+  background: transparent;
+  color: #e0e0e0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.export-menu button:hover {
+  background: #4caf50;
+  color: #fff;
+}
+
+.export-menu button.active {
+  color: #4caf50;
+  font-weight: 600;
 }
 
 #viewport {

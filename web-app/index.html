@@ -26,7 +26,14 @@
             <input id="text-input-editor" type="text" placeholder="Enter text..." maxlength="30" />
             <button id="submit-btn-editor">Update</button>
           </div>
-          <button id="export-btn" disabled>Download STL</button>
+          <div class="export-split-btn">
+            <button id="export-btn" disabled>Download STL</button>
+            <button id="export-dropdown-btn" class="export-caret" disabled>&#9662;</button>
+            <div id="export-menu" class="export-menu">
+              <button data-format="stl">STL</button>
+              <button data-format="3mf">3MF</button>
+            </div>
+          </div>
         </div>
         <div id="viewport"></div>
       </div>
