@@ -65,6 +65,13 @@ export class PlaqueViewer {
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 2048;
     dirLight.shadow.mapSize.height = 2048;
+    // Frustum must cover the entire plaque for consistent shadows
+    dirLight.shadow.camera.left = -size;
+    dirLight.shadow.camera.right = size;
+    dirLight.shadow.camera.top = size;
+    dirLight.shadow.camera.bottom = -size;
+    dirLight.shadow.camera.near = 0.1;
+    dirLight.shadow.camera.far = size * 4;
     this.scene.add(dirLight);
 
     const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
