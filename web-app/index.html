@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plaque Maker</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Landing state: centered logo + input -->
+      <div id="landing">
+        <h1 class="logo-title">Plaque Maker</h1>
+        <p class="tagline">Create custom 3D plaques for printing</p>
+        <div class="input-group">
+          <input id="text-input" type="text" placeholder="Enter your text..." maxlength="30" autofocus />
+          <button id="submit-btn">Generate</button>
+        </div>
+      </div>
+
+      <!-- Editor state: top bar + 3D viewport -->
+      <div id="editor">
+        <div id="top-bar">
+          <h2 class="top-logo">Plaque Maker</h2>
+          <div class="top-input-group">
+            <input id="text-input-editor" type="text" placeholder="Enter text..." maxlength="30" />
+            <button id="submit-btn-editor">Update</button>
+          </div>
+          <button id="export-btn" disabled>Download STL</button>
+        </div>
+        <div id="viewport"></div>
+      </div>
+
+      <div id="error-msg" style="display:none;"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
