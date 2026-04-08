@@ -245,3 +245,54 @@ html, body {
   font-size: 0.95rem;
   z-index: 100;
 }
+
+/* ── Mobile responsive ────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .logo-title {
+    font-size: 2rem;
+  }
+
+  .input-group {
+    width: 90%;
+  }
+
+  .input-group input {
+    width: 100%;
+    flex: 1;
+    min-width: 0;
+  }
+
+  #top-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .top-logo {
+    font-size: 1rem;
+  }
+
+  .top-input-group {
+    order: 1;
+    width: 100%;
+    flex: unset;
+  }
+
+  .top-input-group input {
+    max-width: unset;
+  }
+
+  .export-split-btn {
+    margin-left: auto;
+  }
+
+  #export-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .export-caret {
+    padding: 8px 8px;
+  }
+}
