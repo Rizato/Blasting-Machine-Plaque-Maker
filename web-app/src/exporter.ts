@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-import { STLExporter } from 'three/addons/exporters/STLExporter.js';
+import * as THREE from "three";
+import { STLExporter } from "three/addons/exporters/STLExporter.js";
 
-export type ExportFormat = 'stl' | '3mf';
+export type ExportFormat = "stl" | "3mf";
 
 export function exportModel(geometry: THREE.BufferGeometry, text: string, format: ExportFormat) {
-  if (format === '3mf') {
+  if (format === "3mf") {
     export3MF(geometry, text);
   } else {
     exportSTL(geometry, text);
@@ -19,13 +19,13 @@ function exportSTL(geometry: THREE.BufferGeometry, text: string) {
   const exporter = new STLExporter();
   const result = exporter.parse(scene, { binary: true });
 
-  download(new Blob([result], { type: 'application/octet-stream' }), text, 'stl');
+  download(new Blob([result], { type: "application/octet-stream" }), text, "stl");
 }
 
 function export3MF(geometry: THREE.BufferGeometry, text: string) {
   // Expand to non-indexed so we have raw triangles
   const nonIndexed = geometry.index ? geometry.toNonIndexed() : geometry;
-  const positions = nonIndexed.getAttribute('position');
+  const positions = nonIndexed.getAttribute("position");
   const triCount = Math.floor(positions.count / 3);
 
   // Deduplicate vertices using a spatial hash map
@@ -33,7 +33,7 @@ function export3MF(geometry: THREE.BufferGeometry, text: string) {
   const precision = 10000;
   const vertexMap = new Map<string, number>();
   const uniqueVerts: number[] = []; // flat [x,y,z, x,y,z, ...]
-  const triangles: number[] = [];   // flat [v1,v2,v3, v1,v2,v3, ...]
+  const triangles: number[] = []; // flat [v1,v2,v3, v1,v2,v3, ...]
 
   function getVertexIndex(x: number, y: number, z: number): number {
     const rx = Math.round(x * precision) / precision;
@@ -63,12 +63,16 @@ function export3MF(geometry: THREE.BufferGeometry, text: string) {
   // Build XML
   const vertLines: string[] = [];
   for (let i = 0; i < uniqueVerts.length; i += 3) {
-    vertLines.push(`          <vertex x="${uniqueVerts[i]}" y="${uniqueVerts[i + 1]}" z="${uniqueVerts[i + 2]}" />`);
+    vertLines.push(
+      `          <vertex x="${uniqueVerts[i]}" y="${uniqueVerts[i + 1]}" z="${uniqueVerts[i + 2]}" />`,
+    );
   }
 
   const triLines: string[] = [];
   for (let i = 0; i < triangles.length; i += 3) {
-    triLines.push(`          <triangle v1="${triangles[i]}" v2="${triangles[i + 1]}" v3="${triangles[i + 2]}" />`);
+    triLines.push(
+      `          <triangle v1="${triangles[i]}" v2="${triangles[i + 1]}" v3="${triangles[i + 2]}" />`,
+    );
   }
 
   const modelXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -77,10 +81,10 @@ function export3MF(geometry: THREE.BufferGeometry, text: string) {
     <object id="1" type="model">
       <mesh>
         <vertices>
-${vertLines.join('\n')}
+${vertLines.join("\n")}
         </vertices>
         <triangles>
-${triLines.join('\n')}
+${triLines.join("\n")}
         </triangles>
       </mesh>
     </object>
@@ -102,18 +106,22 @@ ${triLines.join('\n')}
 </Relationships>`;
 
   const zip = buildZip([
-    { name: '[Content_Types].xml', data: new TextEncoder().encode(contentTypesXml) },
-    { name: '_rels/.rels', data: new TextEncoder().encode(relsXml) },
-    { name: '3D/3dmodel.model', data: new TextEncoder().encode(modelXml) },
+    { name: "[Content_Types].xml", data: new TextEncoder().encode(contentTypesXml) },
+    { name: "_rels/.rels", data: new TextEncoder().encode(relsXml) },
+    { name: "3D/3dmodel.model", data: new TextEncoder().encode(modelXml) },
   ]);
 
-  download(new Blob([zip.buffer as ArrayBuffer], { type: 'application/vnd.ms-package.3dmanufacturing' }), text, '3mf');
+  download(
+    new Blob([zip.buffer as ArrayBuffer], { type: "application/vnd.ms-package.3dmanufacturing" }),
+    text,
+    "3mf",
+  );
 }
 
 function download(blob: Blob, text: string, ext: string) {
-  const safeName = text.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+  const safeName = text.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `plaque-${safeName}.${ext}`;
   a.click();
@@ -122,7 +130,10 @@ function download(blob: Blob, text: string, ext: string) {
 
 // ── Minimal ZIP builder (store-only, no compression) ────────────────────────
 
-interface ZipEntry { name: string; data: Uint8Array; }
+interface ZipEntry {
+  name: string;
+  data: Uint8Array;
+}
 
 function buildZip(entries: ZipEntry[]): Uint8Array {
   const localHeaders: Uint8Array[] = [];
@@ -196,18 +207,21 @@ function buildZip(entries: ZipEntry[]): Uint8Array {
   for (const p of parts) totalLen += p.length;
   const result = new Uint8Array(totalLen);
   let pos = 0;
-  for (const p of parts) { result.set(p, pos); pos += p.length; }
+  for (const p of parts) {
+    result.set(p, pos);
+    pos += p.length;
+  }
 
   return result;
 }
 
 function crc32(data: Uint8Array): number {
-  let crc = 0xFFFFFFFF;
+  let crc = 0xffffffff;
   for (let i = 0; i < data.length; i++) {
     crc ^= data[i];
     for (let j = 0; j < 8; j++) {
-      crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
     }
   }
-  return (crc ^ 0xFFFFFFFF) >>> 0;
+  return (crc ^ 0xffffffff) >>> 0;
 }

@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import * as THREE from "three";
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
 
 const loader = new STLLoader();
 
@@ -12,7 +12,7 @@ export function loadPlaque(url: string): Promise<THREE.BufferGeometry> {
         resolve(geometry);
       },
       undefined,
-      (error) => reject(error)
+      (error) => reject(error),
     );
   });
 }
