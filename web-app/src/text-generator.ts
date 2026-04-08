@@ -1,8 +1,8 @@
-import * as THREE from 'three';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import type { Font } from 'three/addons/loaders/FontLoader.js';
-import { PLAQUE, OVAL, TEXT_RX, TEXT_RY, STROKE_W } from './plaque-config.ts';
+import * as THREE from "three";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+import type { Font } from "three/addons/loaders/FontLoader.js";
+import { PLAQUE, OVAL, TEXT_RX, TEXT_RY, STROKE_W } from "./plaque-config.ts";
 
 let cachedFont: Font | null = null;
 
@@ -12,9 +12,12 @@ export async function loadFont(url: string): Promise<Font> {
     const loader = new FontLoader();
     loader.load(
       url,
-      (font) => { cachedFont = font; resolve(font); },
+      (font) => {
+        cachedFont = font;
+        resolve(font);
+      },
       undefined,
-      (err) => reject(err)
+      (err) => reject(err),
     );
   });
 }
@@ -36,10 +39,7 @@ function warpXY(normX: number, normY: number): [number, number] {
 
 // ── Generate warped text geometry ───────────────────────────────────────────
 
-export function generateTextGeometry(
-  text: string,
-  font: Font
-): THREE.BufferGeometry | null {
+export function generateTextGeometry(text: string, font: Font): THREE.BufferGeometry | null {
   const upperText = text.toUpperCase();
 
   const textGeo = new TextGeometry(upperText, {
@@ -57,7 +57,7 @@ export function generateTextGeometry(
   const textHeight = bb.max.y - bb.min.y;
   if (textWidth === 0 || textHeight === 0) return null;
 
-  const posAttr = textGeo.getAttribute('position');
+  const posAttr = textGeo.getAttribute("position");
   const positions = posAttr.array as Float32Array;
 
   for (let i = 0; i < posAttr.count; i++) {
@@ -97,19 +97,13 @@ export function generateOvalRing(): THREE.BufferGeometry {
   const outerPoints: THREE.Vector2[] = [];
   for (let i = 0; i <= segments; i++) {
     const angle = (i / segments) * Math.PI * 2;
-    outerPoints.push(new THREE.Vector2(
-      Math.cos(angle) * outerRx,
-      Math.sin(angle) * outerRy
-    ));
+    outerPoints.push(new THREE.Vector2(Math.cos(angle) * outerRx, Math.sin(angle) * outerRy));
   }
 
   const innerPoints: THREE.Vector2[] = [];
   for (let i = segments; i >= 0; i--) {
     const angle = (i / segments) * Math.PI * 2;
-    innerPoints.push(new THREE.Vector2(
-      Math.cos(angle) * rx,
-      Math.sin(angle) * ry
-    ));
+    innerPoints.push(new THREE.Vector2(Math.cos(angle) * rx, Math.sin(angle) * ry));
   }
 
   const outerShape = new THREE.Shape(outerPoints);

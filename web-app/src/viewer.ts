@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 export class PlaqueViewer {
   private scene: THREE.Scene;
@@ -45,7 +45,7 @@ export class PlaqueViewer {
 
     this.setupLighting(cx, cy, maxDim);
 
-    window.addEventListener('resize', () => this.handleResize());
+    window.addEventListener("resize", () => this.handleResize());
 
     this.animate();
   }
@@ -162,13 +162,13 @@ export class PlaqueViewer {
 function mergeForExport(geometries: THREE.BufferGeometry[]): THREE.BufferGeometry {
   let totalVertices = 0;
 
-  const nonIndexed = geometries.map(g => {
+  const nonIndexed = geometries.map((g) => {
     if (g.index) return g.toNonIndexed();
     return g;
   });
 
   for (const geo of nonIndexed) {
-    totalVertices += geo.getAttribute('position').count;
+    totalVertices += geo.getAttribute("position").count;
   }
 
   const positions = new Float32Array(totalVertices * 3);
@@ -176,8 +176,8 @@ function mergeForExport(geometries: THREE.BufferGeometry[]): THREE.BufferGeometr
   let offset = 0;
 
   for (const geo of nonIndexed) {
-    const pos = geo.getAttribute('position');
-    const norm = geo.getAttribute('normal');
+    const pos = geo.getAttribute("position");
+    const norm = geo.getAttribute("normal");
     for (let i = 0; i < pos.count * 3; i++) {
       positions[offset * 3 + i] = (pos.array as Float32Array)[i];
       normals[offset * 3 + i] = (norm.array as Float32Array)[i];
@@ -186,7 +186,7 @@ function mergeForExport(geometries: THREE.BufferGeometry[]): THREE.BufferGeometr
   }
 
   const merged = new THREE.BufferGeometry();
-  merged.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  merged.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+  merged.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  merged.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
   return merged;
 }

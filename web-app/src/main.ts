@@ -1,31 +1,31 @@
-import './style.css';
-import { loadPlaque } from './plaque-loader.ts';
-import { loadFont, generateTextGeometry, generateOvalRing } from './text-generator.ts';
-import { PlaqueViewer } from './viewer.ts';
-import { exportModel } from './exporter.ts';
-import type { ExportFormat } from './exporter.ts';
-import { computeDimensionsFromGeometry } from './plaque-config.ts';
+import "./style.css";
+import { loadPlaque } from "./plaque-loader.ts";
+import { loadFont, generateTextGeometry, generateOvalRing } from "./text-generator.ts";
+import { PlaqueViewer } from "./viewer.ts";
+import { exportModel } from "./exporter.ts";
+import type { ExportFormat } from "./exporter.ts";
+import { computeDimensionsFromGeometry } from "./plaque-config.ts";
 
-const app = document.getElementById('app')!;
-const viewportEl = document.getElementById('viewport')!;
-const textInput = document.getElementById('text-input') as HTMLInputElement;
-const submitBtn = document.getElementById('submit-btn')!;
-const textInputEditor = document.getElementById('text-input-editor') as HTMLInputElement;
-const submitBtnEditor = document.getElementById('submit-btn-editor')!;
-const exportBtn = document.getElementById('export-btn') as HTMLButtonElement;
-const exportCaretBtn = document.getElementById('export-dropdown-btn') as HTMLButtonElement;
-const exportMenu = document.getElementById('export-menu')!;
-const errorEl = document.getElementById('error-msg')!;
+const app = document.getElementById("app")!;
+const viewportEl = document.getElementById("viewport")!;
+const textInput = document.getElementById("text-input") as HTMLInputElement;
+const submitBtn = document.getElementById("submit-btn")!;
+const textInputEditor = document.getElementById("text-input-editor") as HTMLInputElement;
+const submitBtnEditor = document.getElementById("submit-btn-editor")!;
+const exportBtn = document.getElementById("export-btn") as HTMLButtonElement;
+const exportCaretBtn = document.getElementById("export-dropdown-btn") as HTMLButtonElement;
+const exportMenu = document.getElementById("export-menu")!;
+const errorEl = document.getElementById("error-msg")!;
 
 let viewer: PlaqueViewer | null = null;
-let currentText = '';
-let exportFormat: ExportFormat = 'stl';
+let currentText = "";
+let exportFormat: ExportFormat = "stl";
 
 async function init() {
   try {
     const [plaqueGeo, font] = await Promise.all([
-      loadPlaque('empty.stl'),
-      loadFont('helvetiker_bold.typeface.json'),
+      loadPlaque("empty.stl"),
+      loadFont("helvetiker_bold.typeface.json"),
     ]);
 
     // Compute all dimensions from the actual loaded STL
@@ -46,7 +46,7 @@ async function init() {
       textInputEditor.value = text;
 
       // Switch to editor mode — this makes the viewport visible
-      app.classList.add('editor-mode');
+      app.classList.add("editor-mode");
 
       // Force the viewer to size itself now that the container is visible
       viewer!.ensureSized();
@@ -58,18 +58,18 @@ async function init() {
       exportCaretBtn.disabled = !hasText;
     };
 
-    textInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') generatePlaque(textInput.value.trim());
+    textInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") generatePlaque(textInput.value.trim());
     });
-    submitBtn.addEventListener('click', () => generatePlaque(textInput.value.trim()));
+    submitBtn.addEventListener("click", () => generatePlaque(textInput.value.trim()));
 
-    textInputEditor.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') generatePlaque(textInputEditor.value.trim());
+    textInputEditor.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") generatePlaque(textInputEditor.value.trim());
     });
-    submitBtnEditor.addEventListener('click', () => generatePlaque(textInputEditor.value.trim()));
+    submitBtnEditor.addEventListener("click", () => generatePlaque(textInputEditor.value.trim()));
 
     // Export button — downloads in current format
-    exportBtn.addEventListener('click', () => {
+    exportBtn.addEventListener("click", () => {
       if (!viewer) return;
       const combined = viewer.getCombinedGeometry();
       if (combined) {
@@ -78,30 +78,30 @@ async function init() {
     });
 
     // Dropdown caret — toggles format menu
-    exportCaretBtn.addEventListener('click', (e) => {
+    exportCaretBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      exportMenu.classList.toggle('open');
+      exportMenu.classList.toggle("open");
     });
 
     // Format selection from dropdown
-    exportMenu.addEventListener('click', (e) => {
+    exportMenu.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       const format = target.dataset.format as ExportFormat | undefined;
       if (!format) return;
       exportFormat = format;
       exportBtn.textContent = `Download ${format.toUpperCase()}`;
-      exportMenu.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      target.classList.add('active');
-      exportMenu.classList.remove('open');
+      exportMenu.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
+      target.classList.add("active");
+      exportMenu.classList.remove("open");
     });
 
     // Close dropdown when clicking elsewhere
-    document.addEventListener('click', () => {
-      exportMenu.classList.remove('open');
+    document.addEventListener("click", () => {
+      exportMenu.classList.remove("open");
     });
   } catch (err) {
     errorEl.textContent = `Failed to initialize: ${err}`;
-    errorEl.style.display = 'block';
+    errorEl.style.display = "block";
   }
 }
 

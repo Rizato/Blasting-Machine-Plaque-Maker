@@ -1,7 +1,7 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 // These get computed from the actual loaded STL geometry
-export let PLAQUE = {
+export const PLAQUE = {
   width: 47.0,
   depth: 27.0,
   height: 4.0,
@@ -11,12 +11,12 @@ export let PLAQUE = {
   textRaiseHeight: 1.0,
 };
 
-export let OVAL = {
+export const OVAL = {
   rx: 0,
   ry: 0,
-  hMargin: 0.20,
+  hMargin: 0.2,
   vMargin: 0.07,
-  strokeFraction: 0.030,
+  strokeFraction: 0.03,
 };
 
 export let TEXT_RX = 0;
@@ -40,17 +40,17 @@ export function computeDimensionsFromGeometry(geo: THREE.BufferGeometry) {
   PLAQUE.textRaiseHeight = PLAQUE.height * 0.25; // raise text 25% of plaque thickness
 
   // Oval sized to fit inside the plaque face with clearance for fillet edges
-  const ovalFraction = 0.60;
+  const ovalFraction = 0.6;
   OVAL.rx = (PLAQUE.width / 2) * ovalFraction;
   OVAL.ry = (PLAQUE.depth / 2) * ovalFraction;
-  OVAL.hMargin = 0.20;
+  OVAL.hMargin = 0.2;
   OVAL.vMargin = 0.07;
-  OVAL.strokeFraction = 0.030;
+  OVAL.strokeFraction = 0.03;
 
   TEXT_RX = OVAL.rx * (1.0 - OVAL.hMargin);
   TEXT_RY = OVAL.ry * (1.0 - OVAL.vMargin);
   STROKE_W = Math.max(0.3, PLAQUE.width * OVAL.strokeFraction);
 
-  console.log('Plaque dims:', PLAQUE);
-  console.log('Oval:', { rx: OVAL.rx, ry: OVAL.ry, TEXT_RX, TEXT_RY, STROKE_W });
+  console.log("Plaque dims:", PLAQUE);
+  console.log("Oval:", { rx: OVAL.rx, ry: OVAL.ry, TEXT_RX, TEXT_RY, STROKE_W });
 }
