@@ -4,22 +4,49 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg-top: #121323;
+  --bg-bottom: #080914;
+  --panel: rgba(12, 15, 30, 0.88);
+  --panel-border: rgba(153, 171, 255, 0.18);
+  --field-bg: #181b33;
+  --field-border: #3a3f68;
+  --text: #edf0ff;
+  --muted: #9ca5c9;
+  --accent: #86a8ff;
+  --accent-strong: #6f90ea;
+  --success: #59c67a;
+}
+
 html,
 body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #1a1a2e;
-  color: #e0e0e0;
+  font-family:
+    "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(78, 96, 181, 0.24), transparent 36%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  color: var(--text);
   overflow: hidden;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
 #app {
+  position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-
-/* ── Landing State ─────────────────────────────────────────── */
 
 #landing {
   display: flex;
@@ -27,106 +54,178 @@ body {
   align-items: center;
   justify-content: center;
   height: 100%;
-  gap: 16px;
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
+  gap: 18px;
+  padding: 24px;
 }
 
 .logo-title {
-  font-size: 3rem;
+  font-size: 3.2rem;
   font-weight: 800;
-  letter-spacing: 2px;
-  color: #e0e0e0;
+  letter-spacing: 0.16em;
+  color: var(--text);
   text-transform: uppercase;
 }
 
 .tagline {
-  font-size: 1.1rem;
-  color: #888;
-  margin-bottom: 24px;
+  font-size: 1.05rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.input-group,
+.magnet-group,
+.field-group,
+.sidebar-form,
+.field-row {
+  width: min(100%, 340px);
 }
 
 .input-group {
   display: flex;
+  gap: 10px;
+}
+
+.magnet-group,
+.field-group {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
+}
+
+.magnet-group label,
+.field-group label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #c1c9ec;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+input,
+select,
+button {
+  font: inherit;
 }
 
 .input-group input,
-.top-input-group input {
-  padding: 12px 20px;
-  font-size: 1.1rem;
-  border: 2px solid #444;
-  border-radius: 8px;
-  background: #2a2a3e;
-  color: #e0e0e0;
+.field-group input,
+.magnet-group select,
+.field-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  background: var(--field-bg);
+  color: var(--text);
   outline: none;
-  width: 300px;
-  transition: border-color 0.2s;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .input-group input:focus,
-.top-input-group input:focus {
-  border-color: #6c63ff;
+.field-group input:focus,
+.magnet-group select:focus,
+.field-group select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(134, 168, 255, 0.15);
 }
 
 .input-group button,
-.top-input-group button {
-  padding: 12px 24px;
-  font-size: 1rem;
-  font-weight: 600;
+.primary-button {
   border: none;
-  border-radius: 8px;
-  background: #6c63ff;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
   color: #fff;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.input-group button:hover,
-.top-input-group button:hover {
-  background: #5a52d5;
-}
-
-/* ── Editor State ──────────────────────────────────────────── */
-
-#editor {
-  display: none;
-  flex-direction: column;
-  height: 100%;
-}
-
-#top-bar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 20px;
-  background: #16162a;
-  border-bottom: 1px solid #333;
-  flex-shrink: 0;
-}
-
-.top-logo {
-  font-size: 1.2rem;
   font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #ccc;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.input-group button {
+  padding: 12px 20px;
   white-space: nowrap;
 }
 
-.top-input-group {
+.input-group button:hover,
+.primary-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+#editor {
+  display: none;
+  height: 100%;
+}
+
+#editor-shell {
   display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+#sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 20px;
+  background: var(--panel);
+  border-right: 1px solid var(--panel-border);
+  backdrop-filter: blur(18px);
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  flex: 1;
 }
 
-.top-input-group input {
-  flex: 1;
-  max-width: 400px;
+.top-logo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-/* ── Split export button ───────────────────────────────────── */
+.sidebar-copy {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.sidebar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  background: rgba(24, 27, 51, 0.72);
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.checkbox-row span {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
 
 .export-split-btn {
   position: relative;
@@ -135,61 +234,50 @@ body {
 }
 
 #export-btn {
-  padding: 10px 20px;
+  flex: 1;
+  padding: 12px 16px;
   font-size: 0.95rem;
-  font-weight: 600;
-  border: 2px solid #4caf50;
-  border-right: 1px solid #4caf50;
-  border-radius: 8px 0 0 8px;
-  background: transparent;
-  color: #4caf50;
+  font-weight: 700;
+  border: 1px solid rgba(89, 198, 122, 0.6);
+  border-right: none;
+  border-radius: 12px 0 0 12px;
+  background: rgba(16, 32, 20, 0.45);
+  color: var(--success);
   cursor: pointer;
-  transition: all 0.2s;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 #export-btn:hover:not(:disabled) {
-  background: #4caf50;
-  color: #fff;
+  background: rgba(89, 198, 122, 0.16);
 }
 
-#export-btn:disabled {
-  border-color: #555;
-  color: #555;
+#export-btn:disabled,
+.export-caret:disabled {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #59607f;
   cursor: not-allowed;
 }
 
 .export-caret {
-  padding: 10px 10px;
-  font-size: 0.85rem;
-  border: 2px solid #4caf50;
-  border-left: 1px solid #4caf50;
-  border-radius: 0 8px 8px 0;
-  background: transparent;
-  color: #4caf50;
+  padding: 12px 12px;
+  border: 1px solid rgba(89, 198, 122, 0.6);
+  border-radius: 0 12px 12px 0;
+  background: rgba(16, 32, 20, 0.45);
+  color: var(--success);
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.export-caret:hover:not(:disabled) {
-  background: #4caf50;
-  color: #fff;
-}
-
-.export-caret:disabled {
-  border-color: #555;
-  color: #555;
-  cursor: not-allowed;
 }
 
 .export-menu {
   display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 6px);
   right: 0;
-  margin-top: 4px;
-  background: #1e1e36;
-  border: 1px solid #444;
-  border-radius: 6px;
+  min-width: 120px;
+  background: #111528;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
   overflow: hidden;
   z-index: 10;
 }
@@ -200,102 +288,85 @@ body {
 }
 
 .export-menu button {
-  padding: 8px 24px;
-  font-size: 0.9rem;
+  padding: 10px 14px;
   border: none;
   background: transparent;
-  color: #e0e0e0;
-  cursor: pointer;
+  color: var(--text);
   text-align: left;
+  cursor: pointer;
 }
 
 .export-menu button:hover {
-  background: #4caf50;
-  color: #fff;
+  background: rgba(134, 168, 255, 0.16);
 }
 
 .export-menu button.active {
-  color: #4caf50;
-  font-weight: 600;
+  color: var(--accent);
+  font-weight: 700;
 }
 
 #viewport {
   flex: 1;
+  min-width: 0;
   min-height: 0;
 }
-
-/* ── State transitions ─────────────────────────────────────── */
 
 #app.editor-mode #landing {
   display: none;
 }
 
 #app.editor-mode #editor {
-  display: flex;
+  display: block;
 }
-
-/* ── Error message ─────────────────────────────────────────── */
 
 #error-msg {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #d32f2f;
+  max-width: min(90vw, 720px);
+  background: #cf4456;
   color: #fff;
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
   font-size: 0.95rem;
   z-index: 100;
 }
 
-/* ── Mobile responsive ────────────────────────────────────── */
+@media (max-width: 900px) {
+  #editor-shell {
+    flex-direction: column;
+  }
 
-@media (max-width: 600px) {
+  #sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--panel-border);
+  }
+}
+
+@media (max-width: 640px) {
+  html,
+  body {
+    overflow: auto;
+  }
+
   .logo-title {
-    font-size: 2rem;
+    font-size: 2.3rem;
+    letter-spacing: 0.12em;
+    text-align: center;
   }
 
   .input-group {
-    width: 90%;
+    flex-direction: column;
   }
 
-  .input-group input {
-    width: 100%;
-    flex: 1;
-    min-width: 0;
+  #sidebar {
+    padding: 18px 14px;
   }
 
-  #top-bar {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px 12px;
-  }
-
-  .top-logo {
-    font-size: 1rem;
-  }
-
-  .top-input-group {
-    order: 1;
-    width: 100%;
-    flex: unset;
-  }
-
-  .top-input-group input {
-    max-width: unset;
-  }
-
-  .export-split-btn {
-    margin-left: auto;
-  }
-
-  #export-btn {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-
+  #export-btn,
   .export-caret {
-    padding: 8px 8px;
+    min-height: 46px;
   }
 }

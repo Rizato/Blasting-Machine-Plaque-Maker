@@ -53,3 +53,9 @@ web-app/
 
 - [Vite](https://vite.dev/) + TypeScript
 - [Three.js](https://threejs.org/) — 3D rendering, STL loading/export, text geometry
+
+## Font licensing
+
+The application code is MIT-licensed, but bundled font assets keep their own
+licenses. The redistributed font notices and license texts are included in
+`web-app/public/THIRD_PARTY_FONT_LICENSES.txt`.
