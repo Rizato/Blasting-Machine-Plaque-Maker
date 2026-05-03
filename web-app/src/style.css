@@ -5,6 +5,7 @@
 }
 
 :root {
+  color-scheme: dark;
   --bg-top: #121323;
   --bg-bottom: #080914;
   --panel: rgba(12, 15, 30, 0.88);
@@ -13,9 +14,46 @@
   --field-border: #3a3f68;
   --text: #edf0ff;
   --muted: #9ca5c9;
+  --label: #c1c9ec;
   --accent: #86a8ff;
   --accent-strong: #6f90ea;
   --success: #59c67a;
+  --success-text: #59c67a;
+  --success-bg: rgba(16, 32, 20, 0.45);
+  --success-bg-hover: rgba(89, 198, 122, 0.16);
+  --success-border: rgba(89, 198, 122, 0.6);
+  --checkbox-bg: rgba(24, 27, 51, 0.72);
+  --checkbox-bg-checked: rgba(134, 168, 255, 0.24);
+  --checkbox-border-checked: #86a8ff;
+  --grid-line: rgba(255, 255, 255, 0.045);
+  --focus-ring: rgba(134, 168, 255, 0.15);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg-top: #eef2ff;
+    --bg-bottom: #d9e4f5;
+    --panel: rgba(255, 255, 255, 0.86);
+    --panel-border: rgba(64, 88, 155, 0.16);
+    --field-bg: rgba(247, 250, 255, 0.95);
+    --field-border: #b5c1de;
+    --text: #192235;
+    --muted: #5d6b86;
+    --label: #46546f;
+    --accent: #476dcc;
+    --accent-strong: #3354ad;
+    --success: #00a63e;
+    --success-text: #ffffff;
+    --success-bg: #00a63e;
+    --success-bg-hover: #00bc47;
+    --success-border: #006d28;
+    --checkbox-bg: rgba(71, 109, 204, 0.12);
+    --checkbox-bg-checked: rgba(71, 109, 204, 0.24);
+    --checkbox-border-checked: #2d64ff;
+    --grid-line: rgba(25, 34, 53, 0.06);
+    --focus-ring: rgba(71, 109, 204, 0.16);
+  }
 }
 
 html,
@@ -35,8 +73,8 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 32px 32px;
   pointer-events: none;
 }
@@ -96,7 +134,7 @@ body::before {
 .field-group label {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #c1c9ec;
+  color: var(--label);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -129,7 +167,7 @@ button {
 .magnet-group select:focus,
 .field-group select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(134, 168, 255, 0.15);
+  box-shadow: 0 0 0 4px var(--focus-ring);
 }
 
 .input-group button,
@@ -212,8 +250,12 @@ button {
   padding: 12px 14px;
   border: 1px solid var(--field-border);
   border-radius: 12px;
-  background: rgba(24, 27, 51, 0.72);
+  background: var(--checkbox-bg);
   cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .checkbox-row input {
@@ -227,6 +269,12 @@ button {
   font-weight: 600;
 }
 
+.checkbox-row:has(input:checked) {
+  background: var(--checkbox-bg-checked);
+  border-color: var(--checkbox-border-checked);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--checkbox-border-checked) 30%, transparent);
+}
+
 .export-split-btn {
   position: relative;
   display: flex;
@@ -238,11 +286,11 @@ button {
   padding: 12px 16px;
   font-size: 0.95rem;
   font-weight: 700;
-  border: 1px solid rgba(89, 198, 122, 0.6);
+  border: 1px solid var(--success-border);
   border-right: none;
   border-radius: 12px 0 0 12px;
-  background: rgba(16, 32, 20, 0.45);
-  color: var(--success);
+  background: var(--success-bg);
+  color: var(--success-text);
   cursor: pointer;
   transition:
     background 0.2s ease,
@@ -250,7 +298,7 @@ button {
 }
 
 #export-btn:hover:not(:disabled) {
-  background: rgba(89, 198, 122, 0.16);
+  background: var(--success-bg-hover);
 }
 
 #export-btn:disabled,
@@ -262,10 +310,11 @@ button {
 
 .export-caret {
   padding: 12px 12px;
-  border: 1px solid rgba(89, 198, 122, 0.6);
+  border: 1px solid var(--success-border);
+  border-left: 1px solid var(--success-border);
   border-radius: 0 12px 12px 0;
-  background: rgba(16, 32, 20, 0.45);
-  color: var(--success);
+  background: var(--success-bg);
+  color: var(--success-text);
   cursor: pointer;
 }
 
@@ -275,8 +324,8 @@ button {
   top: calc(100% + 6px);
   right: 0;
   min-width: 120px;
-  background: #111528;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--field-bg);
+  border: 1px solid var(--success-border);
   border-radius: 10px;
   overflow: hidden;
   z-index: 10;
