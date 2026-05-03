@@ -52,8 +52,23 @@ body {
   gap: 8px;
 }
 
+.magnet-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.magnet-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #b9b9d8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .input-group input,
-.top-input-group input {
+.top-input-group input,
+.magnet-group select {
   padding: 12px 20px;
   font-size: 1.1rem;
   border: 2px solid #444;
@@ -66,7 +81,8 @@ body {
 }
 
 .input-group input:focus,
-.top-input-group input:focus {
+.top-input-group input:focus,
+.magnet-group select:focus {
   border-color: #6c63ff;
 }
 
@@ -124,6 +140,15 @@ body {
 .top-input-group input {
   flex: 1;
   max-width: 400px;
+}
+
+.magnet-group-editor {
+  min-width: 150px;
+}
+
+.magnet-group-editor select {
+  padding: 10px 14px;
+  font-size: 0.95rem;
 }
 
 /* ── Split export button ───────────────────────────────────── */
@@ -260,6 +285,10 @@ body {
     width: 90%;
   }
 
+  .magnet-group {
+    width: 90%;
+  }
+
   .input-group input {
     width: 100%;
     flex: 1;
@@ -282,11 +311,21 @@ body {
     flex: unset;
   }
 
+  .magnet-group-editor {
+    order: 2;
+    width: 100%;
+  }
+
+  .magnet-group-editor select {
+    width: 100%;
+  }
+
   .top-input-group input {
     max-width: unset;
   }
 
   .export-split-btn {
+    order: 3;
     margin-left: auto;
   }
 

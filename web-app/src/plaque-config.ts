@@ -1,5 +1,23 @@
 import * as THREE from "three";
 
+export const MAGNET_OPTIONS = [
+  { id: "3x1", label: "3 x 1 mm", diameter: 3, depth: 1 },
+  { id: "5x1", label: "5 x 1 mm", diameter: 5, depth: 1 },
+  { id: "6x2", label: "6 x 2 mm", diameter: 6, depth: 2 },
+  { id: "6x3", label: "6 x 3 mm", diameter: 6, depth: 3 },
+  { id: "8x2", label: "8 x 2 mm", diameter: 8, depth: 2 },
+  { id: "8x3", label: "8 x 3 mm", diameter: 8, depth: 3 },
+] as const;
+
+export type MagnetSizeId = (typeof MAGNET_OPTIONS)[number]["id"];
+export type MagnetOption = (typeof MAGNET_OPTIONS)[number];
+
+export const MAGNET_POCKET = {
+  widthClearance: 0.2,
+  depthClearance: 0.25,
+  lipRadius: 0.5,
+};
+
 // These get computed from the actual loaded STL geometry
 export const PLAQUE = {
   width: 47.0,

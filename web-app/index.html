@@ -12,6 +12,10 @@
       <div id="landing">
         <h1 class="logo-title">Plaque Maker</h1>
         <p class="tagline">Create custom 3D plaques for printing</p>
+        <div class="magnet-group">
+          <label for="magnet-size">Magnet size</label>
+          <select id="magnet-size"></select>
+        </div>
         <div class="input-group">
           <input id="text-input" type="text" placeholder="Enter your text..." maxlength="30" autofocus />
           <button id="submit-btn">Generate</button>
@@ -25,6 +29,10 @@
           <div class="top-input-group">
             <input id="text-input-editor" type="text" placeholder="Enter text..." maxlength="30" />
             <button id="submit-btn-editor">Update</button>
+          </div>
+          <div class="magnet-group magnet-group-editor">
+            <label for="magnet-size-editor">Magnet size</label>
+            <select id="magnet-size-editor"></select>
           </div>
           <div class="export-split-btn">
             <button id="export-btn" disabled>Download STL</button>
