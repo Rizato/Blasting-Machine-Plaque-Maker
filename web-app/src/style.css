@@ -25,7 +25,7 @@
   --checkbox-bg: rgba(24, 27, 51, 0.72);
   --checkbox-bg-checked: rgba(134, 168, 255, 0.24);
   --checkbox-border-checked: #86a8ff;
-  --grid-line: rgba(255, 255, 255, 0.02);
+  --grid-line: rgba(255, 255, 255, 0.045);
   --focus-ring: rgba(134, 168, 255, 0.15);
 }
 
