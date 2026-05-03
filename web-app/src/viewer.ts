@@ -138,7 +138,7 @@ export class PlaqueViewer {
 
   private applyViewportTheme() {
     const isLight = this.themeMediaQuery.matches;
-    this.scene.background = new THREE.Color(isLight ? 0xe9eef9 : 0x2d2d2d);
+    this.scene.background = new THREE.Color(isLight ? 0xe9eef9 : 0x121323);
 
     if (this.grid) {
       const materials = Array.isArray(this.grid.material)
@@ -247,8 +247,8 @@ export class PlaqueViewer {
     const colorAttr = this.grid.geometry.getAttribute("color") as THREE.BufferAttribute | undefined;
     if (!colorAttr) return;
 
-    const majorColor = this.gridMajorColorAttribute.set(isLight ? 0x2f66ff : 0xaebeea);
-    const minorColor = this.gridMinorColorAttribute.set(isLight ? 0x83a3ea : 0xb6b6b6);
+    const majorColor = this.gridMajorColorAttribute.set(isLight ? 0x2f66ff : 0x6f90ea);
+    const minorColor = this.gridMinorColorAttribute.set(isLight ? 0x83a3ea : 0x4f6ba9);
     const colors = colorAttr.array as Float32Array;
 
     for (let i = 0; i < colors.length; i += 6) {
