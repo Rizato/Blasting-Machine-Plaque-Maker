@@ -71,8 +71,8 @@ function createMagnetPocketGeometry(
   const centerY = (bb.min.y + bb.max.y) / 2;
   const backZ = bb.min.z;
   const plaqueThickness = bb.max.z - bb.min.z;
-  const eps = 0.02;
-  const arcSegments = 24;
+  const eps = 0.08;
+  const arcSegments = 32;
 
   if (pocketDepth >= plaqueThickness) {
     throw new Error(
@@ -82,17 +82,16 @@ function createMagnetPocketGeometry(
 
   const profile: THREE.Vector2[] = [
     new THREE.Vector2(0, -eps),
-    new THREE.Vector2(0, 0),
-    new THREE.Vector2(openingRadius, 0),
+    new THREE.Vector2(openingRadius, -eps),
   ];
 
   for (let step = 1; step <= arcSegments; step++) {
     const t = step / arcSegments;
-    const angle = (Math.PI / 2) * (1 - t);
+    const angle = t * (Math.PI / 2);
     profile.push(
       new THREE.Vector2(
-        pocketRadius + lipRadius * (1 + Math.cos(Math.PI - angle)),
-        lipRadius - lipRadius * Math.sin(angle),
+        openingRadius - lipRadius * Math.sin(angle),
+        -eps + lipRadius * (1 - Math.cos(angle)),
       ),
     );
   }

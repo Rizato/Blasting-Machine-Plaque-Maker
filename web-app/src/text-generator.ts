@@ -4,16 +4,22 @@ import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 import type { Font } from "three/addons/loaders/FontLoader.js";
 import { PLAQUE, OVAL, TEXT_RX, TEXT_RY, STROKE_W } from "./plaque-config.ts";
 
-let cachedFont: Font | null = null;
+const cachedFonts = new Map<string, Font>();
+
+export interface TextSettings {
+  textDepth: number;
+  useOvalDeform: boolean;
+}
 
 export async function loadFont(url: string): Promise<Font> {
+  const cachedFont = cachedFonts.get(url);
   if (cachedFont) return cachedFont;
   return new Promise((resolve, reject) => {
     const loader = new FontLoader();
     loader.load(
       url,
       (font) => {
-        cachedFont = font;
+        cachedFonts.set(url, font);
         resolve(font);
       },
       undefined,
@@ -39,13 +45,17 @@ function warpXY(normX: number, normY: number): [number, number] {
 
 // ── Generate warped text geometry ───────────────────────────────────────────
 
-export function generateTextGeometry(text: string, font: Font): THREE.BufferGeometry | null {
+export function generateTextGeometry(
+  text: string,
+  font: Font,
+  settings: TextSettings,
+): THREE.BufferGeometry | null {
   const upperText = text.toUpperCase();
 
   const textGeo = new TextGeometry(upperText, {
     font: font,
     size: 10,
-    depth: 1,
+    depth: settings.textDepth,
     bevelEnabled: false,
     curveSegments: 8,
   });
@@ -56,6 +66,25 @@ export function generateTextGeometry(text: string, font: Font): THREE.BufferGeom
   const textWidth = bb.max.x - bb.min.x;
   const textHeight = bb.max.y - bb.min.y;
   if (textWidth === 0 || textHeight === 0) return null;
+
+  if (!settings.useOvalDeform) {
+    const maxWidth = TEXT_RX * 2;
+    const maxHeight = TEXT_RY * 2;
+    const fitScale = Math.min(maxWidth / textWidth, maxHeight / textHeight);
+    textGeo.scale(fitScale, fitScale, 1);
+    textGeo.computeBoundingBox();
+    const scaledBb = textGeo.boundingBox!;
+    const scaledWidth = scaledBb.max.x - scaledBb.min.x;
+    const scaledHeight = scaledBb.max.y - scaledBb.min.y;
+    textGeo.translate(
+      PLAQUE.centerX - (scaledBb.min.x + scaledWidth / 2),
+      PLAQUE.centerY - (scaledBb.min.y + scaledHeight / 2),
+      PLAQUE.surfaceZ,
+    );
+    textGeo.computeVertexNormals();
+    textGeo.computeBoundingBox();
+    return textGeo;
+  }
 
   const posAttr = textGeo.getAttribute("position");
   const positions = posAttr.array as Float32Array;
@@ -69,9 +98,7 @@ export function generateTextGeometry(text: string, font: Font): THREE.BufferGeom
     const normY = (py - bb.min.y) / textHeight;
 
     const [wx, wy] = warpXY(normX, normY);
-
-    // Z: start flush with plaque surface, raise upward
-    const wz = PLAQUE.surfaceZ + pz * PLAQUE.textRaiseHeight;
+    const wz = PLAQUE.surfaceZ + pz;
 
     positions[i * 3 + 0] = wx;
     positions[i * 3 + 1] = wy;
@@ -87,7 +114,7 @@ export function generateTextGeometry(text: string, font: Font): THREE.BufferGeom
 
 // ── Generate oval ring geometry ─────────────────────────────────────────────
 
-export function generateOvalRing(): THREE.BufferGeometry {
+export function generateOvalRing(settings: TextSettings): THREE.BufferGeometry {
   const segments = 128;
   const rx = OVAL.rx;
   const ry = OVAL.ry;
@@ -111,7 +138,7 @@ export function generateOvalRing(): THREE.BufferGeometry {
   outerShape.holes.push(holePath);
 
   const geo = new THREE.ExtrudeGeometry(outerShape, {
-    depth: PLAQUE.textRaiseHeight,
+    depth: settings.textDepth,
     bevelEnabled: false,
   });
 

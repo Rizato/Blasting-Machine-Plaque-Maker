@@ -12,10 +12,6 @@
       <div id="landing">
         <h1 class="logo-title">Plaque Maker</h1>
         <p class="tagline">Create custom 3D plaques for printing</p>
-        <div class="magnet-group">
-          <label for="magnet-size">Magnet size</label>
-          <select id="magnet-size"></select>
-        </div>
         <div class="input-group">
           <input id="text-input" type="text" placeholder="Enter your text..." maxlength="30" autofocus />
           <button id="submit-btn">Generate</button>
@@ -24,26 +20,50 @@
 
       <!-- Editor state: top bar + 3D viewport -->
       <div id="editor">
-        <div id="top-bar">
-          <h2 class="top-logo">Plaque Maker</h2>
-          <div class="top-input-group">
-            <input id="text-input-editor" type="text" placeholder="Enter text..." maxlength="30" />
-            <button id="submit-btn-editor">Update</button>
-          </div>
-          <div class="magnet-group magnet-group-editor">
-            <label for="magnet-size-editor">Magnet size</label>
-            <select id="magnet-size-editor"></select>
-          </div>
-          <div class="export-split-btn">
-            <button id="export-btn" disabled>Download STL</button>
-            <button id="export-dropdown-btn" class="export-caret" disabled>&#9662;</button>
-            <div id="export-menu" class="export-menu">
-              <button data-format="stl">STL</button>
-              <button data-format="3mf">3MF</button>
+        <div id="editor-shell">
+          <aside id="sidebar">
+            <div class="sidebar-header">
+              <h2 class="top-logo">Plaque Maker</h2>
+              <p class="sidebar-copy">Adjust text, styling, and magnet options, then export the model.</p>
             </div>
-          </div>
+            <div class="sidebar-form">
+              <div class="field-group">
+                <label for="text-input-editor">Text</label>
+                <input id="text-input-editor" type="text" placeholder="Enter text..." maxlength="30" />
+              </div>
+
+              <div class="field-group">
+                <label for="font-select">Font</label>
+                <select id="font-select"></select>
+              </div>
+
+              <div class="field-group">
+                <label for="text-depth-input">Text height</label>
+                <input id="text-depth-input" type="number" min="0.4" max="4" step="0.1" value="1" />
+              </div>
+
+              <label class="checkbox-row" for="oval-deform-checkbox">
+                <input id="oval-deform-checkbox" type="checkbox" checked />
+                <span>Oval &amp; deform</span>
+              </label>
+
+              <div class="field-group">
+                <label for="magnet-size-editor">Magnet size</label>
+                <select id="magnet-size-editor"></select>
+              </div>
+
+              <div class="export-split-btn">
+                <button id="export-btn" disabled>Download STL</button>
+                <button id="export-dropdown-btn" class="export-caret" disabled>&#9662;</button>
+                <div id="export-menu" class="export-menu">
+                  <button data-format="stl">STL</button>
+                  <button data-format="3mf">3MF</button>
+                </div>
+              </div>
+            </div>
+          </aside>
+          <div id="viewport"></div>
         </div>
-        <div id="viewport"></div>
       </div>
 
       <div id="error-msg" style="display:none;"></div>

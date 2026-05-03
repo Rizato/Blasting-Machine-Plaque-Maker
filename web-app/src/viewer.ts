@@ -109,11 +109,14 @@ export class PlaqueViewer {
     this.scene.add(this.plaqueMesh);
   }
 
-  setOvalRing(geometry: THREE.BufferGeometry) {
+  setOvalRing(geometry: THREE.BufferGeometry | null) {
     if (this.ovalMesh) {
       this.scene.remove(this.ovalMesh);
       this.ovalMesh.geometry.dispose();
+      this.ovalMesh = null;
     }
+    if (!geometry) return;
+
     const material = new THREE.MeshStandardMaterial({
       color: 0xcccccc,
       roughness: 0.6,

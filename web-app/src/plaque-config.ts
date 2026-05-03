@@ -12,6 +12,16 @@ export const MAGNET_OPTIONS = [
 export type MagnetSizeId = (typeof MAGNET_OPTIONS)[number]["id"];
 export type MagnetOption = (typeof MAGNET_OPTIONS)[number];
 
+export const FONT_OPTIONS = [
+  {
+    id: "helvetiker-bold",
+    label: "Helvetiker Bold",
+    url: "helvetiker_bold.typeface.json",
+  },
+] as const;
+
+export type FontOptionId = (typeof FONT_OPTIONS)[number]["id"];
+
 export const MAGNET_POCKET = {
   widthClearance: 0.2,
   depthClearance: 0.25,
