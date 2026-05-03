@@ -68,8 +68,8 @@ export function generateTextGeometry(
   if (textWidth === 0 || textHeight === 0) return null;
 
   if (!settings.useOvalDeform) {
-    const maxWidth = TEXT_RX * 2;
-    const maxHeight = TEXT_RY * 2;
+    const maxWidth = OVAL.rx * 2 * 0.96;
+    const maxHeight = OVAL.ry * 2 * 0.9;
     const fitScale = Math.min(maxWidth / textWidth, maxHeight / textHeight);
     textGeo.scale(fitScale, fitScale, 1);
     textGeo.computeBoundingBox();
