@@ -18,6 +18,26 @@ export const FONT_OPTIONS = [
     label: "Helvetiker Bold",
     url: "helvetiker_bold.typeface.json",
   },
+  {
+    id: "helvetiker-regular",
+    label: "Helvetiker Regular",
+    url: "helvetiker_regular.typeface.json",
+  },
+  {
+    id: "droid-sans",
+    label: "Droid Sans",
+    url: "droid_sans_regular.typeface.json",
+  },
+  {
+    id: "droid-serif",
+    label: "Droid Serif",
+    url: "droid_serif_regular.typeface.json",
+  },
+  {
+    id: "gentilis",
+    label: "Gentilis",
+    url: "gentilis_regular.typeface.json",
+  },
 ] as const;
 
 export type FontOptionId = (typeof FONT_OPTIONS)[number]["id"];
