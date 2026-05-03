@@ -24,6 +24,7 @@ export class PlaqueViewer {
     const cy = (bb.min.y + bb.max.y) / 2;
     const cz = (bb.min.z + bb.max.z) / 2;
     const maxDim = Math.max(bb.max.x - bb.min.x, bb.max.y - bb.min.y);
+    const minZ = bb.min.z;
 
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
     this.camera.position.set(cx, cy - maxDim * 0.8, cz + maxDim * 1.2);
@@ -43,7 +44,8 @@ export class PlaqueViewer {
     this.controls.maxDistance = maxDim * 5;
     this.controls.update();
 
-    this.setupLighting(cx, cy, maxDim);
+    this.setupSceneDecorations(cx, cy, minZ, maxDim);
+    this.setupLighting(cx, cy, cz, maxDim);
 
     window.addEventListener("resize", () => this.handleResize());
 
@@ -56,27 +58,51 @@ export class PlaqueViewer {
     });
   }
 
-  private setupLighting(cx: number, cy: number, size: number) {
-    const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+  private setupSceneDecorations(cx: number, cy: number, minZ: number, size: number) {
+    const gridSize = Math.max(size * 3, 120);
+    const divisions = 48;
+    const grid = new THREE.GridHelper(gridSize, divisions, 0x6f90ea, 0x33405f);
+    grid.rotation.x = Math.PI / 2;
+    grid.position.set(cx, cy, minZ - 0.15);
+    (grid.material as THREE.Material).transparent = true;
+    (grid.material as THREE.Material).opacity = 0.45;
+    this.scene.add(grid);
+  }
+
+  private setupLighting(cx: number, cy: number, cz: number, size: number) {
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
     this.scene.add(ambient);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    dirLight.position.set(cx - size, cy - size * 0.5, size * 1.5);
-    dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 2048;
-    dirLight.shadow.mapSize.height = 2048;
-    // Frustum must cover the entire plaque for consistent shadows
-    dirLight.shadow.camera.left = -size;
-    dirLight.shadow.camera.right = size;
-    dirLight.shadow.camera.top = size;
-    dirLight.shadow.camera.bottom = -size;
-    dirLight.shadow.camera.near = 0.1;
-    dirLight.shadow.camera.far = size * 4;
-    this.scene.add(dirLight);
+    const hemi = new THREE.HemisphereLight(0xdde7ff, 0x4a5677, 0.85);
+    hemi.position.set(cx, cy, cz + size * 2.5);
+    this.scene.add(hemi);
 
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    fillLight.position.set(cx + size * 0.5, cy + size * 0.3, size);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.05);
+    keyLight.position.set(cx - size * 0.9, cy - size * 0.7, cz + size * 1.8);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.bias = -0.0004;
+    keyLight.shadow.normalBias = 0.02;
+    keyLight.shadow.camera.left = -size;
+    keyLight.shadow.camera.right = size;
+    keyLight.shadow.camera.top = size;
+    keyLight.shadow.camera.bottom = -size;
+    keyLight.shadow.camera.near = 0.1;
+    keyLight.shadow.camera.far = size * 5;
+    this.scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xe6eeff, 0.75);
+    fillLight.position.set(cx + size * 0.9, cy + size * 0.6, cz + size * 1.2);
     this.scene.add(fillLight);
+
+    const sideLight = new THREE.DirectionalLight(0xf4f7ff, 0.55);
+    sideLight.position.set(cx + size * 1.2, cy - size * 1.1, cz + size * 0.8);
+    this.scene.add(sideLight);
+
+    const rimLight = new THREE.DirectionalLight(0xc8d7ff, 0.35);
+    rimLight.position.set(cx, cy + size * 1.3, cz + size * 1.6);
+    this.scene.add(rimLight);
   }
 
   private handleResize() {
@@ -99,9 +125,9 @@ export class PlaqueViewer {
       this.plaqueMesh.geometry.dispose();
     }
     const material = new THREE.MeshStandardMaterial({
-      color: 0xcccccc,
-      roughness: 0.6,
-      metalness: 0.2,
+      color: 0xd6d8df,
+      roughness: 0.7,
+      metalness: 0.05,
     });
     this.plaqueMesh = new THREE.Mesh(geometry, material);
     this.plaqueMesh.castShadow = true;
@@ -118,9 +144,9 @@ export class PlaqueViewer {
     if (!geometry) return;
 
     const material = new THREE.MeshStandardMaterial({
-      color: 0xcccccc,
-      roughness: 0.6,
-      metalness: 0.2,
+      color: 0xd6d8df,
+      roughness: 0.7,
+      metalness: 0.05,
     });
     this.ovalMesh = new THREE.Mesh(geometry, material);
     this.ovalMesh.castShadow = true;
@@ -136,9 +162,9 @@ export class PlaqueViewer {
     if (!geometry) return;
 
     const material = new THREE.MeshStandardMaterial({
-      color: 0xcccccc,
-      roughness: 0.6,
-      metalness: 0.2,
+      color: 0xd6d8df,
+      roughness: 0.7,
+      metalness: 0.05,
     });
     this.textMesh = new THREE.Mesh(geometry, material);
     this.textMesh.castShadow = true;
